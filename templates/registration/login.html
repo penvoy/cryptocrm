@@ -1,0 +1,25 @@
+{% extends "balance/base.html" %}
+{% load bootstrap5 %} 
+
+{% block title %}Войти{% endblock title %}
+
+{% block header %}
+    <h2>Войти в свой аккаунт</h2>
+{% endblock header %}
+
+{% block content %}
+    <form action="{% url 'login' %}" method="post" class="form">
+        {% csrf_token %}
+        {% bootstrap_form form %}
+
+        {% buttons %}
+            <button class="btn btn-primary" name="submit">Войти</button>
+        {% endbuttons %}
+        
+        <input type="hidden" name="next" value="{% url 'index' %}">
+    </form>
+{% endblock content %}
+
+
+
+

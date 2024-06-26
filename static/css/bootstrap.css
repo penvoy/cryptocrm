@@ -1,0 +1,33 @@
+.container {
+    max-width: 1140px !important;
+
+}
+
+.navbar-toggler {
+    font-size: 0.85rem;
+    padding: 0.25rem;
+}
+
+.navbar {
+    padding: 0.25rem;
+}
+
+.btn-sm {
+    padding: 0.1rem 0.5rem;
+}
+
+.card a {
+    display: block;
+}
+
+.topic h3 {
+    transition: 0.2s ease;
+}
+
+.topic:hover h3 {
+    color: #bbb;
+}
+
+.ms-auto {
+    margin-left: auto;
+  }

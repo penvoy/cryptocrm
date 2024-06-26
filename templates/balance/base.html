@@ -1,0 +1,83 @@
+{% load bootstrap5 %} 
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  {% bootstrap_css %}
+  {% bootstrap_javascript %}
+  <!-- CSS -->
+  <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
+  <title>CryptoCRM</title>
+  <style>
+    .test {
+      display: flex;
+    }
+
+    .navbar-nav {
+      width: 100%;
+      justify-content: space-between;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-3">
+      <div class="container-fluid">
+        <a class="navbar-brand p-0" href="{% url 'index'  %}">
+          CryptoCRM
+        </a>
+        <button class="navbar-toggler m-1"
+          type="button" 
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarSupportedContent"
+          aria-controls="navbarSupportedContent"
+          aria-expanded="false"
+          aria-label="Toggle navigation"> 
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        
+        <div id="navbarSupportedContent" class="collapse navbar-collapse">
+          <ul class="navbar-nav me-1">
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">Настройки</a>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="#">Добавление бирж</a></li>
+                <li><a class="dropdown-item" href="#">Создание пользователей</a></li>
+              </ul>
+            </li>
+            {% if user.is_authenticated %}
+            <div class="test">
+              <li class="list-item me-2">
+                <a class="nav-link disabled">Привет, {{ user.username }}</a>
+              </li>   
+              <li class="nav-item me-2">
+                <a href="{% url 'logout' %}" aria-current="page" class="nav-link">Выйти</a>
+              </li>
+            {% else %}
+              <li class="nav-item me-2">
+                <a href="{%url 'login' %}" aria-current="page" class="nav-link">Войти</a>
+              </li>
+            {% endif %}
+          </div>
+          </ul>
+        </div>
+
+      </div>
+    </nav>
+  <!-- End Navbar -->
+
+  <!-- Container -->
+  <div class="container py-4 ">
+    <div class="pb-2 mb-4 border-bottom">
+      {% block header %}{% endblock header %}
+    </div>
+    <div>
+      {% block content %}{% endblock content %}
+    </div>
+  </div>
+  <!-- End Container -->
+</body>
+</html>
