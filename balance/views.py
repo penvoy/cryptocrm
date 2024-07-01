@@ -68,22 +68,22 @@ def get_balance_garantex(uid, private_key):
     locked = 0
     usdt_balance = 0
     for coin in response.json():
+        print("coin",coin)
         if float(coin.get("balance")) > 0:
-            print(coin)
             if coin.get("currency") == 'usdt':
-                # вывести наверх, когда будет ясность с курсом
                 result += float(coin.get("balance"))
                 locked += float(coin.get("locked"))
-                usdt_balance = float(coin.get("balance"))
+                usdt_balance += float(coin.get("balance"))
             else:
                 price = get_сurrency_rate(token, host, coin.get("currency"))
                 if price:
                     price = float(price)
+                    print(price)
                     if coin.get("currency").startswith("usd"):
-                        print("got usd")
                         result += float(coin.get("balance"))
                         locked += float(coin.get("locked"))
                     elif coin.get("currency") == "rub":
+                        usdt_balance += (float(coin.get("balance")) // price)
                         result += (float(coin.get("balance")) // price)
                         locked += (float(coin.get("locked")) // price)
                     else:
@@ -105,6 +105,11 @@ def get_rates_rapira(currency):
         market_data = response_data.get("data", [])
         
         for item in market_data:
+            if currency == "RUB":
+                if item.get("quoteCurrency") == 'USDT' and item.get("baseCurrency") == currency:
+                    rate = item.get("close")
+                    return rate
+                
             if item.get("quoteCurrency") == currency and item.get("baseCurrency") == 'USDT':
                 rate = item.get("close")
                 return rate
@@ -127,17 +132,24 @@ def get_balance_rapira(uid, secret):
 
     for coin in response.json():
         if float(coin.get("balance")) > 0:
+            print(coin)
             if coin.get("unit") == 'USDT':
                 result += float(coin.get("balance"))
                 locked += float(coin.get("frozenBalance"))
-                usdt_balance = float(coin.get("balance"))
+                usdt_balance += float(coin.get("balance"))
 
             else:
                 rate = get_rates_rapira(coin.get("unit"))
                 if rate:
                     rate = float(rate)
-                    available_in_usdt = float(coin.get("balance")) * rate
-                    freeze_in_usdt = float(coin.get("frozenBalance")) * rate
+                    print(rate)
+                    if coin.get("unit") == "RUB":
+                        available_in_usdt = float(coin.get("balance")) // rate
+                        freeze_in_usdt = float(coin.get("frozenBalance")) // rate
+                        usdt_balance += available_in_usdt
+                    else:
+                        available_in_usdt = float(coin.get("balance")) * rate
+                        freeze_in_usdt = float(coin.get("frozenBalance")) * rate
                     
                     result += available_in_usdt
                     locked += freeze_in_usdt
@@ -150,37 +162,76 @@ def get_balance_rapira(uid, secret):
 
 
 
+def get_rates_bb(session):
+    try:
+        response = session.get_tickers(
+            category="spot"
+        )
+    except:
+        return []
+    else:
+        result = response.get("result")
+        if result:
+            result_list = result.get("list", [])
+
+            return result_list
+
+
+api_key='eTlRADh49FWjVyrBN8'
+api_secret = 'KJoxtdpXWm21lgLlDizXXUwKruA12BjhEplF'
+accountType = "UNIFIED"
+
 def get_balance_bb(api_key, api_secret, accountType):
     session = HTTP(
         testnet=False,
         api_key=api_key,
         api_secret=api_secret,
-        max_retries=5,
+        max_retries=8,
         retry_delay=5,
         )
     try:
-        response = session.get_wallet_balance(
-            accountType=accountType)
+        response_coins = session.get_coins_balance(
+                accountType="FUND")
+        response_wallet = session.get_wallet_balance(
+                accountType=accountType)
     except Exception as e:
         raise e
     else:
-        result = response.get("result")
-        if result:
-            if result.get("list"):
-                result = result["list"][0]
-                total = float(result.get("totalWalletBalance", 0))
-                coins = result.get("coin", [])
-                total_usdt = 0
-                for coin in coins:
-                    if coin.get("coin") == "USDT":
-                        total_usdt = float(coin.get("walletBalance"))
-                return (
-                    {
-                        "result":total,
-                        "locked": 0,
-                        "usdt_balance": total_usdt
-                    }
-                )
+        result_coins = response_coins.get("result")
+        result_wallet = response_wallet.get("result")
+
+        if result_coins:
+            result_coins = result_coins.get("balance")
+
+        if result_wallet:
+            if result_wallet.get("list"):
+                result_wallet = result_wallet["list"][0]
+                result_wallet = result_wallet.get("coin", [])
+
+        result = result_wallet + result_coins
+
+        total_usdt = 0
+        total = 0
+
+        rates = get_rates_bb(session)
+        for coin in result:
+            print(coin)
+            if coin.get("coin") == "USDT":
+                total += float(coin.get("walletBalance"))
+                total_usdt += float(coin.get("walletBalance"))
+            else:
+                for rate in rates:
+                    if (coin.get("coin") + "USDT") == rate.get("symbol"):
+                        print(rate)
+                        total += float(coin.get("walletBalance")) * float(rate.get("lastPrice"))
+
+        return(
+            {
+                "result":total,
+                "locked": 0,
+                "usdt_balance": total_usdt
+            }
+        )
 
 
 def get_balance_cryptomus(merchant_id, api_key):
@@ -206,7 +257,7 @@ def get_balance_cryptomus(merchant_id, api_key):
             if float(coin.get("balance")) > 0:
                 result += float(coin.get("balance_usd"))
                 if coin.get("currency_code") == 'USDT':
-                    usdt_balance = float(coin.get("balance"))
+                    usdt_balance += float(coin.get("balance"))
         return ({
             "result": result,
             "locked": locked,
@@ -225,11 +276,10 @@ def get_available_markets_whitebit(url):
         response_data = json.dumps(response.json(), sort_keys=True, indent=4)
 
         return response_data
-
-def get_balance_whitebit(secret_key, api_key):
-    # request = '/api/v4/trade-account/balance'  # put here request path. For obtaining trading balance use: /api/v4/trade-account/balance
-    request = '/api/v4/main-account/balance'
+    
+def send_request(request, api_key, secret_key):
     baseUrl = 'https://whitebit.com'  # domain without last slash. Do not use https://whitebit.com/
+
     # If the nonce is similar to or lower than the previous request number, you will receive the 'too many requests' error message
     nonce = time.time_ns() // 1_000_000  # nonce is a number (preferrably epoch time in milliseconds) that is always higher than the previous request number
 
@@ -257,39 +307,65 @@ def get_balance_whitebit(secret_key, api_key):
     # sending request
     response = requests.post(completeUrl, headers=headers, data=data_json, timeout=5)
 
-    if response.status_code == 200:
+    return response
+
+
+def get_balance_whitebit(secret_key, api_key):
+
+    main_request = '/api/v4/main-account/balance'
+    request_trading = '/api/v4/trade-account/balance'
+
+    result = 0
+    locked = 0
+    usdt_balance = 0
+
+    markets = get_available_markets_whitebit("https://whitebit.com")
+    if markets:
+        markets = json.loads(markets)
+    trading_response = send_request(request_trading, api_key, secret_key)
+    if trading_response.status_code == 200:
+        for key, value in trading_response.json().items():
+            if value.get("available") > '0':
+                if key == 'USDT':
+                    result += float(value.get("available"))
+                    usdt_balance += float(value.get("available"))
+                    locked += float(value.get("freeze"))
+                else:
+                    for market, price in markets.items():
+                        if market.startswith(key) and market.endswith("USDT"):
+                            course = price.get("last_price")
+                            if course:
+                                course = float(course)
+                                available_in_usdt = float(value.get("available")) * course
+                                freeze_in_usdt = float(value.get("freeze")) * course
+
+                                result += available_in_usdt
+
         
-        markets = get_available_markets_whitebit(baseUrl)
-        if markets:
-            markets = json.loads(markets)
-            result = 0
-            locked = 0
-            usdt_balance = 0
-            for key, value in response.json().items():
-                if value.get("main_balance") > "0":
-                    if key == 'USDT':
-                        result += float(value.get("main_balance"))
-                        usdt_balance = float(value.get("main_balance"))
-                    else:
-                        for market, price in markets.items():
-                            if market.startswith(key) and market.endswith("USDT"):
-                                course = price.get("last_price")
-                                if course:
-                                    course = float(course)
-                                    available_in_usdt = float(value.get("main_balance")) * course
+    main_response = send_request(main_request, api_key, secret_key)
+    if main_response.status_code == 200:  
+        for key, value in main_response.json().items():
+            if value.get("main_balance") > "0":
+                if key == 'USDT':
+                    result += float(value.get("main_balance"))
+                    usdt_balance += float(value.get("main_balance"))
+                else:
+                    for market, price in markets.items():
+                        if market.startswith(key) and market.endswith("USDT"):
+                            course = price.get("last_price")
+                            if course:
+                                course = float(course)
+                                available_in_usdt = float(value.get("main_balance")) * course
 
-                                    result += available_in_usdt
+                                result += available_in_usdt
 
-                            
                     
-            return ({
-                    "result": result,
-                    "locked": locked,
-                    "usdt_balance": usdt_balance
-                    })
+    return ({
+            "result": result,
+            "locked": locked,
+            "usdt_balance": usdt_balance
+            })
 
-# TO DO// сделать получение с байбита 
-# написать шаблоны (вход, баланс, настройки(добавление юзеров, добавление бирж))
 
 @login_required
 def get_balance(request):
@@ -317,33 +393,38 @@ def get_balance(request):
         },
         {
             "name":"bybit",
-            "uid":'UzbeUaa73FlFI5w2nemfYF1Eg40ntZPs0Dih', # secret
-            "key":'LBiJMb8yAtNsZzwa7q',# api key
-            "account" : "ББ Эмиль" 
+            "uid":'KJoxtdpXWm21lgLlDizXXUwKruA12BjhEplF', # secret
+            "key":'eTlRADh49FWjVyrBN8',# api key
+            "account" : "ББ Эмиль" ,
+            "accountType": "UNIFIED"
         },
         {
             "name":"bybit",
             "uid":'SSMatCmRGozi5ybHz3tZvdY05nuP8ELAnw88', # secret
             "key":'eCGzXUFHYUEvf7QxKb',# api key
-            "account": "ББ Илья" 
+            "account": "ББ Илья",
+            "accountType": "UNIFIED"
         },
         {
             "name":"bybit",
             "uid":'M7yqxz4O70G3k4t1lOXs0iuhzIuZ09Ckx6PD', # secret
             "key":'dsAsiOmKSBcAQmfe2a',# api key
-            "account": "ББ Адель" 
+            "account": "ББ Адель" ,
+            "accountType": "UNIFIED"
         },
         {
             "name":"bybit",
-            "uid":'pyOZGrgLnu2Ku0mdNia7Poty7VlDRDV6udxP', # secret
-            "key":'aBQj2ZqqToqCLH2RKa',# api key
-            "account": "ББ К" 
+            "uid":'oWtvJzmqsW16ISB1dd7gyLz8g5wDSjsiOQ5h', # secret
+            "key":'HM2jdtY7soqkokzYdz',# api key
+            "account": "ББ К" ,
+            "accountType": "UNIFIED"
         },
         {
             "name":"bybit",
             "uid":'UzbeUaa73FlFI5w2nemfYF1Eg40ntZPs0Dih', # secret
             "key":'LBiJMb8yAtNsZzwa7q',# api key
-            "account": "ББ Даши" 
+            "account": "ББ Даши",
+            "accountType": "SPOT"
         },
         {
             "name":"bybit",
@@ -355,6 +436,7 @@ def get_balance(request):
 
         result = 0
         locked = 0 
+        total_bybit = 0
         response = {}
         try:
             for target in accounts_data:
@@ -377,22 +459,22 @@ def get_balance(request):
                     response_data = get_balance_rapira(uid, key)
                     response['rapira'] = response_data.get("usdt_balance", 0)
 
-                result += response_data.get("result")
-                locked += response_data.get("locked")
 
                 if target.get("name") == 'bybit':
                     accountType = target.get("accountType")
+                    print(target.get("account"))
                     if accountType:
                         response_data = get_balance_bb(key, uid, accountType)
+                        response_data['account'] = target.get("account")
 
-                        result += response_data.get("result")
-                        locked += response_data.get("locked")
                         if response.get("bybit"):
-                            response["bybit"] = response.get("bybit") + response_data.get("usdt_balance", 0)
+                            response["bybit"].append(response_data)
                         else:
-                            response['bybit'] = response_data.get("usdt_balance", 0)
-                # result += response_data.get("result")
-                # locked += response_data.get("locked")
+                            response['bybit'] = [response_data]
+
+                print(response_data)
+                result += response_data.get("result")
+                locked += response_data.get("locked")
         except Exception as e:
             print("ошибка")
             return render(request, 'errors/500.html', context={"error": str(e)})
