@@ -59,7 +59,7 @@
                 {% for column in balance.bybit %}
                 <tr>
                   <td>{{column.account}}</td>
-                  <td>{{column.usdt_balance|floatformat:2 }}</td>
+                  <td>{{column.result|floatformat:2 }}</td>
                 {% endfor %}
                 <td>{% total_sum balance.bybit%}</td>
                 </tr>
