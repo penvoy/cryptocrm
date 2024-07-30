@@ -173,8 +173,7 @@ def get_rates_bb(session):
             return result_list
 
 
-# api_key='LBiJMb8yAtNsZzwa7q'
-# api_secret = 'UzbeUaa73FlFI5w2nemfYF1Eg40ntZPs0Dih'
+
 # accountType = "UNIFIED"
 
 # session = HTTP(
@@ -377,63 +376,7 @@ def get_balance_whitebit(secret_key, api_key):
 @login_required
 def get_balance(request):
     if request.method == "POST":
-        accounts_data = [
-        {
-            "name":"garantex",
-            "uid":"64072430-c44b-48e2-a852-596529904858",
-            "key":"LS0tLS1CRUdJTiBSU0EgUFJJVkFURSBLRVktLS0tLQpNSUlFcFFJQkFBS0NBUUVBOFBZSGREblVZMzBieHVhTzBWVTFoeG42TjRkeHpmN1dvVFlHb3ZWeWp2ZC9XUGFRCm9mKzVDRDdXU21YLzBSR0xQVEdlVStQdldKOXZGVjJwb0N6a0VxcWY2bEE1cWVOSk1hL0xQdnhqd1dWaXB6cEMKYUh1b0wrTUlyNHRMeGRENXpjZDV2T0RIZU1KbzJuNWlxUWRmNS9YZFVvaTdxdGVIWW1xQkYxeTZ2ajdpOHJERQp4b3NxMTRCcThGcmdRcld4OVZtcXd0VGhuenZIU3UremkxYS84cFNTbEdtRmg3RDIzWldiRmVWeEVqSGZlbFBmCmpkR2FDdDEzY3B5SWdtcVluMGFsN3g2aVozaHVQeGZVZUdhVGV0eWhpSXF5U0hka2pkMHVGQzJZSTJ6WU1sdFMKN2hLSlNxazNKaVZhYW9mclNOMmorN3d6Vkh4c2dwakdoOW1GcHdJREFRQUJBb0lCQUFuQ3h4RDUvaTd1Rkp0NAo1WTBuQUNwU0FFeE11MVZta0VmVHlLanlucXFDN2RDOGhnTGszQ1BxcjFwZS9nVFZlVlBJSVAvT3NENCtrTysxCjIvL0k2bmh0MVJNb2syNGlrYU95Tm5XZ2ZXN25XYzAwSEMrT1V5ZnlLdkZRWlNzb0FBTGhkaUY4RXN0bUFXVncKRUpHRVl0S3VFRGFZZElsVWlkYlZ6UC9tOUFvb0ljVFRueUZ4QUJOMzZRTzlJY3I2ZVFvZllQL1RoOCt5YVZxUwoxdnpoM2wzK0hkTjR1amRVbkJlbE80ZWpySVNZaCtBUStXTzB2VXNrSFdYWXczL2RIWk82bytFWmpFa1I3R1ZyCjhlYXRDcjVLN2g4OG9uVUY1S1l1REhvd1R3S1cwT1ZlYXBNZHhpcnBOU2s3cXZwajVPTHVJdStEdWtWUUUrZEgKWmdHMjBUa0NnWUVBLzBwWEFXZk5iSjRPdWt3SUZJQWpLd0tTNFM1WnBCTUhLdDY2Nk83SncyNnpIMWRTcjVKQQphKzVzUlhmVnpMNlcwaTVEeUV0aUwrSVRqUXJNaDBGWW82eDBzNml6Q1VoWnNmWGpTdkt2TTFYalNaa3M0cU5BClRFQ3UxUHVjcjZ1UVhTSVpha2paT0xwenh0OHJURk4zbEd4b2Y4MlpDQVpVTHVZRmNuZ0NLZDhDZ1lFQThhRisKSkxKeGFyMm83SmJxRFdEOFhLRFUraWsyaytNK0xMU1pDSXZrRkFKZlNwZjNERi96UjFmQnZRdnpLWTNIYlB4aAozUXZzR0M3d08rMS9UYWlLck8wRGF2Qkh1VnQzRlBXbzA3c3QzR0pldmx1K0JuZmRHYXUzVDlRMFlKdXBrQXVuCjJwN1ZxcEFldFk0S1U3VC9leThkRG4ybFVvRXU3ak85Y2ZZK0xUa0NnWUVBak80cUY5R0krdVJLZHhmUUFoazIKME9DTDJ4bXVUTUJnWFk4MW1hOXczSjE0N3QxUy9TOTh0dGlaRnNSdjE2YUROaVpxTHVGR28rNW5JcDZLaUVSUAp2Wk5QblhxTTA1d0lRQkRnMkJnZkZmVGRFMTBuQlRwZ0hYZzd5OEhYSHJkVWE4V09TRGxOQ1Y4TTJRV01Mb2VKClpQdHZ1TlgwSEJUNlZpV1Bia0RIMlBzQ2dZRUEzYUVTNHZZSnNhNWsweDFaY1F3VWJhSFh0OTAxZ2xCZEp3US8KbWVjMlBHUXdvMnJmM3luakt2MERaek1leG02VkRSSXhjVjhPSHVCdTJZanR5MzFjTldEd1VaWXpNNEVCcU9mcgpBc29kTnBmRDd6YVhCYmZMeFZBTHc5MFFiY3hacXhZRjBERUFLb0ltcU1Dd0dEZGNYdERJQmhLWklTUDh0K0FkClUvcFk3WUVDZ1lFQTVUYTcrRTAvODFmeW9Wbm1EeU5MVTBlT0JCSENjWmJDOEgzVSswTm5BYWhVOVVXbnFqRmMKOEhDNHNSZ2pmUGh5dk1EVXcrbkZqM05mbFlGeGpZVXBGSzFOMldrY0xrZVJQYzlVanExcmhac0Q4M2JZWEJmdgp2T1dWT2lnaDhOVjVUdnRoMXA3Ri9kcXZGT29weDVucDFzQ3MvSVg2a0thS21xWE9RRDRyYndBPQotLS0tLUVORCBSU0EgUFJJVkFURSBLRVktLS0tLQo="
-        },
-        {
-            "name":"rapira",
-            "uid":"7919eb47-6b25-440c-88c2-2ae8037c9c5b",
-            "key":"LS0tLS1CRUdJTiBSU0EgUFJJVkFURSBLRVktLS0tLQpNSUlFdlFJQkFEQU5CZ2txaGtpRzl3MEJBUUVGQUFTQ0JLY3dnZ1NqQWdFQUFvSUJBUUNSTmhaSU9JVTFiQ01MNjdJWlRxZTlPTURwTU5ZejhXYW1DbFJlaVFZSlVJWXJaZTZDbVQ0ZWxOMDkvb0RnMU9BSFRYWEJkZ2xCM2puSlpNRTh6bHA2OWd4aWVGYm13RUczRjMzZk03MEdjZzErYUM4YTk5cWNaQVdPL0hLc2IwQnNpK202SVowV2tnUWlhWnlCNEJ0MWtldmJGazl5Wmp5eDZ2YVZ3OFM3azByM3hNc1V5VnRaSEpibDlmdXVuWk9hTmZVMVZnSlZHVGRhdGIvZlo2N21jZ0IvVW04ME1HZjlTcGw0ZTR1U3U2UitpMkpLeUJrdlZxZ2xweWU0bnVyOXFyWk9nQXl1MEhTdGtobTcySEpSQ254dkhDMGlCWEpxL21lNWthVFR4WGdra3o0ZGlrRHlXQk40MzVkdzc3L0czSExqc1VXTUNIRjhpTUR1VTAvMUFnTUJBQUVDZ2dFQUNZQW9RV01QOVczL29GZUprd0NqbG95VjNvdnNtb0JvVHJrWDlRbHlXaWlwRVVJb01wRHBKZ3k4L3V5SVY4TEZ3am5qV0ViVjZ6ZlVGYnBMQkU5SFR6VTFtK1JlRElIaFZYa3ExSnJUZXJqNmxnaDdVSUNOT1RTTmJUZFV5Z3NMV1lRUlJPQWtkdEM5M0N5SEZMT1V5RmZ3UGxOOWhqRnNpNExMemF6OTBhY3VWTGppazlJL2RRdytkM1U0Z3J1eDZZcDc5RldqV0cxNmUySVI1aXlxdE02STIwN3Zrem8ySjdZY2NGYXlITXFFTjRsUWFKa3lSMmU3RGFqZEVoWGhDRkRwYXp3UDdwVDd6dUNmbTN3Q3dPWXBpRjJVbzRMdDQ0MDdsNzBUU1JlTTRSaXNRWHZOSm03eUFZTGdzRVZuczM1Ylg2bjlwdURlS2dwVWNvbE4zd0tCZ1FDNjJSUEJSQVFTSmgxblVBN0tnMkYySGNNbHZiMmNIQmdZbWR1WFRGZk9KTVJoV2RHb29Qc01sUFREQTR1dWtsTWhmVGU1MVZJWFBGNWJYbE9GaHVMOXppR2hVdTJ1dlVDSnpNU3FCVWVva2FScms5aW5GcExhRzFsTDNST2ZTK0IzTG1TTWZhUUpQMVZab1pXVHFKdUtOSXJRWTF5MEkxb2c2Rkc0ckpWeUl3S0JnUURHOUNQQzRBUDMzL29DdkdhZkxRaVhrUHVhSWZSaDF5a01KMlo4UTczWGt0MnhnVDJKUjRHOE5rSDh1RkNMN0xMRFRaT2Z2MDd0eUhYUjJGWllwdlNnell1QmZ0OGJOTDUwQnEyK21HaDVTczFiaGorc0puQ05FL2EzSDI0YjdmOTBTbXZlaGNGc0RqRk1iU2NUZkZjZDAxQWV5Skh4enZ0ekZWTW5TbmFiQndLQmdHQklPaGpPSHJibmN5Rm9yS2FJZXZGdHRzQzgvSGIwTnlwK0poeloxeWsvNHY0elZZbHFvdE5COHJxSEdqUno3R2lHYU8vV3ovMXZPMFFqNERBZmFOclduSmZQN3ZDclR4VnpNaWhXbmkxc0YyamovN0ZpUFh3c3VhQVJKT3BpSkNIbUF5UXVIaGd4elo1cFdIV0ZYZGtpNkNFb0FuNUU5VTJkeVhhN1lDczNBb0dCQUpyUkpIcml3M1BCOE5Uc01wY3UvZjZqcllZMVlldzQrQklqSHRjWUI4U1czcmpnTHppQ1VteFpkR1BxTVpPUTcxS1hMWWNqNFpHYmFrT1BLekgxU1d0UVIzelBjMkhDVzJvQ1FIV09OODRhN1U2SlcwYms2clI5a29EUmptZGhmbVhKKzhLL0p0S2xBS3ZPVEpnWEs5dGpzbmNoOEovUVIwODRpdXFLUVYxRkFvR0FMTUUrVmhDT0d4N084MXhaVUFWY0xDUjVxWGVKN0g4M3haM3NCTmkzVTRBUFFRTWFNWC8yNG43RHdBOXBWekxjT3RNcm9QTEZjZFBQejc3ZUUxV2dXei9FQi9aN3ZzS1pHbU9GOU9ybVBXNzVVWmVTOW9saTk5N1V3YTNzQW14UlV1MjRyekRDOW4vcndRVEtjeS9ka1o4UCtKRG43TmF1Tm9mWXFHZnlXcU09Ci0tLS0tRU5EIFJTQSBQUklWQVRFIEtFWS0tLS0tCg=="
-        },
-        {
-            "name":"cryptomus",
-            "uid":"b96f61cf-8ea9-4a50-b471-62a0f057bf03",
-            "key":"n6C9BRrOs10B91ZdXwDv9XFEsZfrDLtB8x1WtpWs2gH4TR5h8nlU4c938Erml9QQpQurPkrOXuLQGFG3mTXGHcCQJb01dm5ZQnUommr7zzBUCZ5R5Xn7IMLCmJE5l3jm"
-        },
-        {
-            "name":"whitebit",
-            "uid":'227a51142975cdf9d04dbffa752145b0', # secret
-            "key":'c09ae7e86682446722772d7dad2a043b' # api key 
-        },
-        {
-            "name":"bybit",
-            "uid":'KJoxtdpXWm21lgLlDizXXUwKruA12BjhEplF', # secret
-            "key":'eTlRADh49FWjVyrBN8',# api key
-            "account" : "ББ Эмиль" ,
-            "accountType": "UNIFIED"
-        },
-        {
-            "name":"bybit",
-            "uid":'SSMatCmRGozi5ybHz3tZvdY05nuP8ELAnw88', # secret
-            "key":'eCGzXUFHYUEvf7QxKb',# api key
-            "account": "ББ Илья",
-            "accountType": "UNIFIED"
-        },
-        {
-            "name":"bybit",
-            "uid":'M7yqxz4O70G3k4t1lOXs0iuhzIuZ09Ckx6PD', # secret
-            "key":'dsAsiOmKSBcAQmfe2a',# api key
-            "account": "ББ Адель" ,
-            "accountType": "UNIFIED"
-        },
-        {
-            "name":"bybit",
-            "uid":'oWtvJzmqsW16ISB1dd7gyLz8g5wDSjsiOQ5h', # secret
-            "key":'HM2jdtY7soqkokzYdz',# api key
-            "account": "ББ К" ,
-            "accountType": "UNIFIED"
-        },
-        {
-            "name":"bybit",
-            "uid":'UzbeUaa73FlFI5w2nemfYF1Eg40ntZPs0Dih', # secret
-            "key":'LBiJMb8yAtNsZzwa7q',# api key
-            "account": "ББ Даши",
-            "accountType": "SPOT"
-        },
-        ]
+        accounts_data = []
 
         result = 0
         locked = 0 
