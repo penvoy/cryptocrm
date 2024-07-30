@@ -1,0 +1,64 @@
+{% extends "balance/base.html" %}
+{% load bootstrap5 %}
+{% load static %}
+
+{% block header %}
+  <h2>Пользователи</h2>
+{% endblock header %}
+
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet"> 
+
+
+{% block content %}
+  <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#myModal" style="margin-bottom: 20px;">
+    Создать пользователя
+  </button>
+  <div class="modal fade" id="myModal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Создание пользователя</h4>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+            <form action="{% url 'user-list-and-create' %}" method="post" class="form">
+                {% csrf_token %}
+                {% bootstrap_form form %}
+                
+                {% buttons %}
+                  <button class="btn btn-primary" name="submit">Создать</button>
+                  <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Закрыть</button>
+                {% endbuttons %}
+            </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card-container" style="display: flex; justify-content: flex-start; flex-direction: column;">
+    {% for user in users %}
+      <div class="card" style="margin-bottom: 20px;">
+        <div class="card bg-light text-dark" style="text-align:left;">
+          <div class="card-header">
+            <img class="card-img-top" src="{% static 'users/images/avatar.png' %}" alt="Card image" style="width:35px">
+              {{ user.username }}
+          </div>
+        </div>
+        <div class="card-body" style="text-align:left;">
+            {% if user.is_superuser %}
+              <span>Администратор</span>
+            {% endif %}
+        </div>
+        <div class="card-footer" style="text-align:right;">
+          <form method="post" action="{% url 'user-delete' user.id %}" class="form">
+            {% csrf_token %}
+            {% buttons %}
+              <button class="btn btn-danger" name="submit">Удалить</button>
+            {% endbuttons %}
+          </form>
+        </div>
+      </div>
+    {% empty %}
+      <li>Нет данных</li>
+    {% endfor %}
+  </div>
+{% endblock content %}

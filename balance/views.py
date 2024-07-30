@@ -68,7 +68,6 @@ def get_balance_garantex(uid, private_key):
     locked = 0
     usdt_balance = 0
     for coin in response.json():
-        print("coin",coin)
         if float(coin.get("balance")) > 0:
             if coin.get("currency") == 'usdt':
                 result += float(coin.get("balance"))
@@ -78,7 +77,6 @@ def get_balance_garantex(uid, private_key):
                 price = get_сurrency_rate(token, host, coin.get("currency"))
                 if price:
                     price = float(price)
-                    print(price)
                     if coin.get("currency").startswith("usd"):
                         result += float(coin.get("balance"))
                         locked += float(coin.get("locked"))
@@ -132,7 +130,6 @@ def get_balance_rapira(uid, secret):
 
     for coin in response.json():
         if float(coin.get("balance")) > 0:
-            print(coin)
             if coin.get("unit") == 'USDT':
                 result += float(coin.get("balance"))
                 locked += float(coin.get("frozenBalance"))
@@ -142,7 +139,6 @@ def get_balance_rapira(uid, secret):
                 rate = get_rates_rapira(coin.get("unit"))
                 if rate:
                     rate = float(rate)
-                    print(rate)
                     if coin.get("unit") == "RUB":
                         available_in_usdt = float(coin.get("balance")) // rate
                         freeze_in_usdt = float(coin.get("frozenBalance")) // rate
@@ -177,9 +173,20 @@ def get_rates_bb(session):
             return result_list
 
 
-api_key='eTlRADh49FWjVyrBN8'
-api_secret = 'KJoxtdpXWm21lgLlDizXXUwKruA12BjhEplF'
-accountType = "UNIFIED"
+# api_key='LBiJMb8yAtNsZzwa7q'
+# api_secret = 'UzbeUaa73FlFI5w2nemfYF1Eg40ntZPs0Dih'
+# accountType = "UNIFIED"
+
+# session = HTTP(
+#         testnet=False,
+#         api_key=api_key,
+#         api_secret=api_secret,
+#         max_retries=8,
+#         retry_delay=5,
+#         )
+
+# print(session.get_spot_asset_info(
+#     accountType="SPOT"))
 
 def get_balance_bb(api_key, api_secret, accountType):
     session = HTTP(
@@ -426,13 +433,7 @@ def get_balance(request):
             "account": "ББ Даши",
             "accountType": "SPOT"
         },
-        {
-            "name":"bybit",
-            "uid":'E7nmFrSQyyNKys5YiApUrUnG2lC9biyLKGHp', # secret
-            "key":'I8PFTbMg4vrLjYUIlB',# api key
-            "account": "ББ Марат" ,
-            "accountType" : "UNIFIED"
-        }]
+        ]
 
         result = 0
         locked = 0 
@@ -445,24 +446,23 @@ def get_balance(request):
                 key = target.get("key")
                 if target.get("name") == 'garantex':
                     response_data = get_balance_garantex(uid, key)
-                    response['garantex'] = response_data.get("usdt_balance", 0)
+                    response['garantex'] = response_data.get("result", 0)
 
                 if target.get("name") == 'cryptomus':
                     response_data = get_balance_cryptomus(uid, key)
-                    response['cryptomus'] = response_data.get("usdt_balance", 0)
+                    response['cryptomus'] = response_data.get("result", 0)
 
                 if target.get("name") == 'whitebit':
                     response_data = get_balance_whitebit(uid, key)
-                    response['whitebit'] = response_data.get("usdt_balance", 0)
+                    response['whitebit'] = response_data.get("result", 0)
 
                 if target.get("name") == 'rapira':
                     response_data = get_balance_rapira(uid, key)
-                    response['rapira'] = response_data.get("usdt_balance", 0)
+                    response['rapira'] = response_data.get("result", 0)
 
 
                 if target.get("name") == 'bybit':
                     accountType = target.get("accountType")
-                    print(target.get("account"))
                     if accountType:
                         response_data = get_balance_bb(key, uid, accountType)
                         response_data['account'] = target.get("account")
@@ -472,9 +472,8 @@ def get_balance(request):
                         else:
                             response['bybit'] = [response_data]
 
-                print(response_data)
-                result += response_data.get("result")
-                locked += response_data.get("locked")
+                result += round(response_data.get("result"), 2)
+                locked += round(response_data.get("locked"), 2)
         except Exception as e:
             print("ошибка")
             return render(request, 'errors/500.html', context={"error": str(e)})

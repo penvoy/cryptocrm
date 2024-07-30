@@ -15,10 +15,16 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
+from rest_framework import routers
+
 from django.contrib.auth.views import LoginView, LogoutView
 from balance.views import get_balance, index
+from users.views import UserViewSet
 
+
+router = routers.DefaultRouter()
+router.register(r'users', UserViewSet, basename='user')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -26,6 +32,7 @@ urlpatterns = [
     path('logout', LogoutView.as_view(), name='logout'),
     path('api/balance', get_balance, name='balance'),
     path("", index, name='index'),
+    path('settings/', include(router.urls))
 
     
 ]

@@ -38,17 +38,18 @@
           aria-label="Toggle navigation"> 
             <span class="navbar-toggler-icon"></span>
         </button>
-        
         <div id="navbarSupportedContent" class="collapse navbar-collapse">
           <ul class="navbar-nav me-1">
+            {% if user.is_authenticated %}
+            {% if user.is_superuser %}
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">Настройки</a>
               <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="#">Добавление бирж</a></li>
-                <li><a class="dropdown-item" href="#">Создание пользователей</a></li>
+                <li><a class="dropdown-item" href="#">Аккаунты бирж</a></li>
+                <li><a class="dropdown-item" href="{% url 'user-list-and-create'  %}">Пользователи</a></li>
               </ul>
             </li>
-            {% if user.is_authenticated %}
+            {% endif %}
             <div class="test">
               <li class="list-item me-2">
                 <a class="nav-link disabled">Привет, {{ user.username }}</a>
